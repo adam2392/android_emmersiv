@@ -12,13 +12,29 @@
         android:layout_marginRight="20dp"
         android:text="@string/textview" />
 
-    <!-- SEt OnClickListener to trigger results when pressed -->
-    <Button
-        android:id="@+id/main_button"
+    <!-- Nested layout -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/button" />
+        android:orientation="horizontal">
+
+        <!-- SEt OnClickListener to trigger results when pressed -->
+        <Button
+            android:id="@+id/main_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/button" />
+
+        <!-- Shows an image from your drawable resources -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/ic_launcher"/>
+    </LinearLayout>
+
 
 </LinearLayout>
