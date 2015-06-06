@@ -1,4 +1,4 @@
-package adamli.omgandroid;
+package com.example.adam2392.myfirstapp;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
