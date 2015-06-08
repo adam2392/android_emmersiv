@@ -12,7 +12,7 @@
 
     <!-- For listing apps -->
     <string name="title_activity_list_apps">ListApps</string>
-    <string name="about_title">Javatechig.com</string>
-    <string name="about_desc">Provides tutorials... Adam Li</string>
+    <string name="about_title">Listing Applications for Usage</string>
+    <string name="about_desc">Provided by... Adam Li</string>
     <string name="action_about">About</string>
 </resources>

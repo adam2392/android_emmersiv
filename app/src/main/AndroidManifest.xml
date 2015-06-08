@@ -30,14 +30,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DisplayMessageActivity"
-            android:label="@string/title_activity_display_message"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.adam2392.myfirstapp.MainActivity" />
-        </activity>
-        <activity
             android:name=".ListApps"
             android:label="@string/title_activity_list_apps"
             android:parentActivityName=".MainActivity" >

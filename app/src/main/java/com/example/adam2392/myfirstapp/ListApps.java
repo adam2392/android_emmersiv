@@ -1,20 +1,15 @@
 package com.example.adam2392.myfirstapp;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.*;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,9 +19,21 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 
+/* Class to control the listing of apps pages within the shell (MainActivity)
+ * Layouts:
+ *  - activity_list_apps.xml (to display a ListView of different app's icons, descriptions)
+ *  - snippet_list_row.xml (to display each row in activity list)
+ *
+ * Classes:
+ *  - ApplicationAdapter is used to get all the apps information
+ *
+ *  */
 public class ListApps extends ListActivity {
+    public static String PACKAGE_NAME;  // to keep track of the shell's package name
+
     private PackageManager packageManager = null;
     private List<ApplicationInfo> appList = null;
     private ApplicationAdapter listadapter = null;
@@ -35,6 +42,8 @@ public class ListApps extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_apps);    //set the content view to the xml file in "layout"
+
+        PACKAGE_NAME = getApplicationContext().getPackageName();    //store the local package name
 
         //perform an async task to get list of app details... long process
         packageManager = getPackageManager();
@@ -55,10 +64,10 @@ public class ListApps extends ListActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        boolean result = true;
+        boolean result = true;      // default return statement
 
         switch (item.getItemId()) {
-            case R.id.menu_about: {
+            case R.id.menu_about: { //open up an about menu tab
                 displayAboutDiaglog();
                 break;
             }
@@ -67,7 +76,6 @@ public class ListApps extends ListActivity {
                 break;
             }
         }
-
         return result;
     }
 
@@ -77,12 +85,24 @@ public class ListApps extends ListActivity {
         super.onListItemClick(l, v, position, id);
 
         ApplicationInfo app = appList.get(position);
+        Timer timer = new Timer();                          // initialize a timer object
+
         try {
             // get the package info for that app selected
             Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
 
             if(intent != null) {
-                startActivity(intent);
+                startActivity(intent);      // start the activity that was clicked
+
+                timer.schedule(             //start a schedule
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                killApp();  // closes the app, and reopens the shell
+                            }
+                        },
+                        5000            // the amount of time before execution
+                );
             }
         } catch (ActivityNotFoundException e) { // when no activity
             Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -90,8 +110,6 @@ public class ListApps extends ListActivity {
             Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
-
-
 
     /* Function for displaying dialog when user clicks 'about' */
     private void displayAboutDiaglog() {
@@ -102,7 +120,7 @@ public class ListApps extends ListActivity {
         builder.setPositiveButton("Know More", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://javatechig.com"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://westhealth.org"));
                 startActivity(browserIntent);
                 dialog.cancel();
             }
@@ -117,20 +135,20 @@ public class ListApps extends ListActivity {
         builder.show();
     }
 
-
+    /* Check an app to see if there is a launch intent */
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
         ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
-                    applist.add(info);
+                    applist.add(info);      //add info to the app list
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        return applist;
+        return applist; //returns the list of apps and their info
     }
 
     /* Asynchronous method for loading the applciations */
@@ -138,8 +156,11 @@ public class ListApps extends ListActivity {
         private ProgressDialog progress = null;
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {     //perform task in the background
+            //intialize the app list and their corresponding meta data
             appList = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
+
+            //create a custom list adapter
             listadapter = new ApplicationAdapter(ListApps.this,
                     R.layout.snippet_list_row, appList);
 
@@ -169,5 +190,14 @@ public class ListApps extends ListActivity {
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
+    }
+
+    /* Method to return to shell */
+    public void killApp() {
+        // get the package info for the shell
+        Intent intent = packageManager.getLaunchIntentForPackage(PACKAGE_NAME);
+
+        startActivity(intent);
+        finish();
     }
 }

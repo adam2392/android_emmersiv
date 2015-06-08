@@ -17,11 +17,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/* Create a custom Adapter for a custom ListView */
 public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
     private List<ApplicationInfo> appsList = null;
     private Context context;
     private PackageManager packageManager;
 
+    /* Constructor
+     * Inputs:
+     *  - context: the context
+     *  - textViewResourceId: the id of a text view
+     *  - appsList: the list of applications with their meta data
+     */
     public ApplicationAdapter(Context context, int textViewResourceId,
                               List<ApplicationInfo> appsList) {
         super(context, textViewResourceId, appsList);
@@ -30,6 +37,7 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         packageManager = context.getPackageManager();
     }
 
+    //get the size of the appslist
     @Override
     public int getCount() {
         return ((null != appsList) ? appsList.size() : 0);
@@ -45,6 +53,7 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         return position;
     }
 
+    // get the view and connect snippet with listapps.xml
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;

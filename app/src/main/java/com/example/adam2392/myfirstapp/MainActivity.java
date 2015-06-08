@@ -7,14 +7,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 //This is the main activity class
 public class MainActivity extends Activity {
-
-    public final static String EXTRA_MESSAGE = "com.AdamLi.myFirstApp";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,39 +30,30 @@ public class MainActivity extends Activity {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_search:
-                openSearch();
+                openSearch();           //open up searching capabilities if we need
                 return true;
             case R.id.action_settings:
-                openSettings();
+                openSettings();         //open up a settings menu
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /* Called when user clicks the 'Send' button */
-    public void sendMessage(View view) {
-        //do something after button clicked
-        Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-
-        String message = editText.getText().toString(); //gather the text from the text panel
-        intent.putExtra(EXTRA_MESSAGE, message);    //input the message
-        startActivity(intent);      //start an instance of the intent
-    }
-
     /* Called when user clicks list apps button */
     public void listApps(View view) {
-        Intent intent = new Intent(this, ListApps.class);
+        Intent intent = new Intent(this, ListApps.class);   //open up the ListApps class
 
-        startActivity(intent);
+        startActivity(intent);  //starts that intent
     }
 
+    /* Open up search settings */
     private void openSearch() {
         Toast.makeText(this, "Search button pressed", Toast.LENGTH_SHORT).show();
     }
 
+    /* Open up settings */
     private void openSettings() {
-
+        Toast.makeText(this, "Settings button pressed", Toast.LENGTH_SHORT).show();
     }
 }
