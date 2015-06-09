@@ -90,6 +90,8 @@ public class ListApps extends ListActivity {
         try {
             // get the package info for that app selected
             Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
+            intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);         //exclude this from the recent history
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             if(intent != null) {
                 startActivity(intent);      // start the activity that was clicked
