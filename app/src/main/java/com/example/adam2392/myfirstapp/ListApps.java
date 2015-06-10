@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -33,7 +35,11 @@ import java.util.Timer;
  *  */
 public class ListApps extends ListActivity {
     public static String PACKAGE_NAME;  // to keep track of the shell's package name
+    public static int progress; //to keep track of the seek bar
 
+    private SeekBar seekBar;
+    private TextView showText;
+    private TextView showTime;
     private PackageManager packageManager = null;
     private List<ApplicationInfo> appList = null;
     private ApplicationAdapter listadapter = null;
@@ -42,12 +48,42 @@ public class ListApps extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_apps);    //set the content view to the xml file in "layout"
-
         PACKAGE_NAME = getApplicationContext().getPackageName();    //store the local package name
 
+        intializeVariables();   //intialize xml variables for seekBar
+        showText.setText("Time: ");    //set seekBar's textVieW
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+                progress = progressValue;
+                Toast.makeText(getApplicationContext(), "Changing time allowed to play!", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+//                showText.setText("Time: ")
+                showTime.setText(Integer.toString(progress));
+                Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        showTime.setText("0");
         //perform an async task to get list of app details... long process
         packageManager = getPackageManager();
         new LoadApplications().execute();
+    }
+
+    //private method to help us initialize variables in xml
+    private void intializeVariables() {
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        showText = (TextView) findViewById(R.id.showText);
+        showTime = (TextView) findViewById(R.id.showTime);
     }
 
     @Override
@@ -91,19 +127,21 @@ public class ListApps extends ListActivity {
             // get the package info for that app selected
             Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
             intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);         //exclude this from the recent history
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);                    //clear this from the top
 
             if(intent != null) {
                 startActivity(intent);      // start the activity that was clicked
-
                 timer.schedule(             //start a schedule
                         new java.util.TimerTask() {
                             @Override
                             public void run() {
+                                Intent intent = packageManager.getLaunchIntentForPackage(PACKAGE_NAME);
+                                startActivity(intent);
+
                                 killApp();  // closes the app, and reopens the shell
                             }
                         },
-                        5000            // the amount of time before execution
+                        progress * 1000            // the amount of time before execution
                 );
             }
         } catch (ActivityNotFoundException e) { // when no activity
@@ -163,6 +201,12 @@ public class ListApps extends ListActivity {
             appList = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
 
             //create a custom list adapter
+                /* Constructor
+                 * Inputs:
+                 *  - context: the context
+                 *  - textViewResourceId: the id of a text view
+                 *  - appsList: the list of applications with their meta data
+                 */
             listadapter = new ApplicationAdapter(ListApps.this,
                     R.layout.snippet_list_row, appList);
 

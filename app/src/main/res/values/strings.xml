@@ -15,4 +15,6 @@
     <string name="about_title">Listing Applications for Usage</string>
     <string name="about_desc">Provided by... Adam Li</string>
     <string name="action_about">About</string>
+    <string name="Time">Time</string>
+    <string name="Filler">Filler Text</string>
 </resources>

@@ -2,11 +2,87 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"
     tools:context="com.example.adam2392.myfirstapp.ListApps">
 
-    <ListView
-        android:id="@android:id/list"
+    <!-- Top Div:
+    The app icons -->
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="0dp"
+        android:layout_weight="7">
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="true">
+            <ListView
+                android:id="@android:id/list"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" />
+            <!--<GridView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:id="@+id/gridview"-->
+                <!--android:columnWidth="90dp"-->
+                <!--android:numColumns="auto_fit"-->
+                <!--android:verticalSpacing="10dp"-->
+                <!--android:horizontalSpacing="10dp"-->
+                <!--android:stretchMode="columnWidth"-->
+                <!--android:gravity="center"-->
+                <!--/>-->
+        </ScrollView>
+    </RelativeLayout>
 
+    <!-- Bottom Div:
+    The seekbar and the corresponding text -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.8"
+        android:orientation="vertical"
+        android:background="@color/ripple_material_dark"
+        >
+
+        <!-- Corresponding text on top of the seekbar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|left"
+                android:paddingLeft="20dp"
+                android:layout_weight="1"
+                android:text="@string/Time"
+                android:id="@+id/showText"
+                android:textSize="@dimen/font_size"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|right"
+                android:paddingRight="20dp"
+                android:inputType="number"
+                android:text="@string/Filler"
+                android:id="@+id/showTime"
+                android:textSize="@dimen/font_size"/>
+        </LinearLayout>
+
+        <!-- The seekbar on the bottom -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <SeekBar
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:id="@+id/seekBar"
+                android:thumb="@drawable/red_scrubber_control"
+                android:progressDrawable="@drawable/red_scrubber_progress"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
+
+
