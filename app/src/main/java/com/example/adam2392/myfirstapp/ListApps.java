@@ -2,7 +2,6 @@ package com.example.adam2392.myfirstapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -17,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.Timer;
 
 
-/* Class to control the listing of apps pages within the shell (MainActivity)
+/* Class to control the listing of apps pages within the shell
  * Layouts:
  *  - activity_list_apps.xml (to display a ListView of different app's icons, descriptions)
  *  - snippet_list_row.xml (to display each row in activity list)
@@ -68,6 +66,16 @@ public class ListApps extends Activity {
 
                     if(intent != null) {
                         startActivity(intent);      // start the activity that was clicked
+//                        timer.schedule(             //start a schedule
+//                                new java.util.TimerTask() {
+//                                    @Override
+//                                    public void run() {
+//                                        Toast.makeText(getApplicationContext(), "5 seconds left!", Toast.LENGTH_SHORT).show();
+//                                    }
+//                                },
+//                                (progress * 1000) - 5000            // the amount of time before execution
+//                        );
+
                         timer.schedule(             //start a schedule
                                 new java.util.TimerTask() {
                                     @Override
@@ -94,23 +102,19 @@ public class ListApps extends Activity {
         intializeVariables();   //intialize xml variables for seekBar
         showText.setText("Time: ");    //set seekBar's textVieW
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
             @Override
             public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
                 progress = progressValue;
-                Toast.makeText(getApplicationContext(), "Changing time allowed to play!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 //                showText.setText("Time: ")
                 showTime.setText(Integer.toString(progress));
-                Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_LONG).show();
             }
         });
         showTime.setText("0");  //set initial showing of '0' minutes
