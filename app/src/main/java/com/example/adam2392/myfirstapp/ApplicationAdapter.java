@@ -37,8 +37,6 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         packageManager = context.getPackageManager();
     }
 
-//    listadapter = new ApplicationAdapter(ListApps.this,
-//                                         R.layout.snippet_list_row, appList);
 
     //get the size of the appslist
     @Override
@@ -69,12 +67,10 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         ApplicationInfo data = appsList.get(position);
         if (null != data) {
             //fill in the snippet_list_row.xml's elements
-            TextView appName = (TextView) view.findViewById(R.id.app_name);
-//            TextView packageName = (TextView) view.findViewById(R.id.app_package);
-            ImageView iconview = (ImageView) view.findViewById(R.id.app_icon);
+            TextView appName = (TextView) view.findViewById(R.id.app_name); //name
+            ImageView iconview = (ImageView) view.findViewById(R.id.app_icon); //the icon
 
             appName.setText(data.loadLabel(packageManager));
-//            packageName.setText(data.packageName);
             iconview.setImageDrawable(data.loadIcon(packageManager));
         }
         return view;

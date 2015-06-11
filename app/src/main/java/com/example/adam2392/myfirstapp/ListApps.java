@@ -1,5 +1,6 @@
 package com.example.adam2392.myfirstapp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -14,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -33,13 +36,14 @@ import java.util.Timer;
  *  - ApplicationAdapter is used to get all the apps information
  *
  *  */
-public class ListApps extends ListActivity {
+public class ListApps extends Activity {
     public static String PACKAGE_NAME;  // to keep track of the shell's package name
     public static int progress; //to keep track of the seek bar
 
     private SeekBar seekBar;
     private TextView showText;
     private TextView showTime;
+    private GridView gridView;
     private PackageManager packageManager = null;
     private List<ApplicationInfo> appList = null;
     private ApplicationAdapter listadapter = null;
@@ -48,6 +52,43 @@ public class ListApps extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_apps);    //set the content view to the xml file in "layout"
+        gridView = (GridView) findViewById(R.id.gridview);  //initialize the gridview layout
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ApplicationInfo app = appList.get(position);
+                Timer timer = new Timer();                          // initialize a timer object
+
+                try {
+                    // get the package info for that app selected
+                    Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);         //exclude this from the recent history
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);                    //clear this from the top
+
+                    if(intent != null) {
+                        startActivity(intent);      // start the activity that was clicked
+                        timer.schedule(             //start a schedule
+                                new java.util.TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = packageManager.getLaunchIntentForPackage(PACKAGE_NAME);
+                                        startActivity(intent);
+
+                                        killApp();  // closes the app, and reopens the shell
+                                    }
+                                },
+                                progress * 1000            // the amount of time before execution
+                        );
+                    }
+                } catch (ActivityNotFoundException e) { // when no activity
+                    Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                } catch (Exception e) { //other exceptions
+                    Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }); //end of grid click listener
+
         PACKAGE_NAME = getApplicationContext().getPackageName();    //store the local package name
 
         intializeVariables();   //intialize xml variables for seekBar
@@ -72,12 +113,12 @@ public class ListApps extends ListActivity {
                 Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_LONG).show();
             }
         });
+        showTime.setText("0");  //set initial showing of '0' minutes
 
-        showTime.setText("0");
         //perform an async task to get list of app details... long process
         packageManager = getPackageManager();
         new LoadApplications().execute();
-    }
+    }   //end of "OnCreate"
 
     //private method to help us initialize variables in xml
     private void intializeVariables() {
@@ -115,42 +156,6 @@ public class ListApps extends ListActivity {
         return result;
     }
 
-    /* Function to handle what happens when a list item gets clicked */
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        ApplicationInfo app = appList.get(position);
-        Timer timer = new Timer();                          // initialize a timer object
-
-        try {
-            // get the package info for that app selected
-            Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
-            intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);         //exclude this from the recent history
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);                    //clear this from the top
-
-            if(intent != null) {
-                startActivity(intent);      // start the activity that was clicked
-                timer.schedule(             //start a schedule
-                        new java.util.TimerTask() {
-                            @Override
-                            public void run() {
-                                Intent intent = packageManager.getLaunchIntentForPackage(PACKAGE_NAME);
-                                startActivity(intent);
-
-                                killApp();  // closes the app, and reopens the shell
-                            }
-                        },
-                        progress * 1000            // the amount of time before execution
-                );
-            }
-        } catch (ActivityNotFoundException e) { // when no activity
-            Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
-        } catch (Exception e) { //other exceptions
-            Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
     /* Function for displaying dialog when user clicks 'about' */
     private void displayAboutDiaglog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -180,7 +185,7 @@ public class ListApps extends ListActivity {
         ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
         for (ApplicationInfo info : list) {
             try {
-                if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
+                if (packageManager.getLaunchIntentForPackage(info.packageName) != null) {
                     applist.add(info);      //add info to the app list
                 }
             } catch (Exception e) {
@@ -200,7 +205,7 @@ public class ListApps extends ListActivity {
             //intialize the app list and their corresponding meta data
             appList = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
 
-            //create a custom list adapter
+            //create a custom adapter
                 /* Constructor
                  * Inputs:
                  *  - context: the context
@@ -220,10 +225,11 @@ public class ListApps extends ListActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            setListAdapter(listadapter);
+            gridView.setAdapter(listadapter);
             progress.dismiss();
             super.onPostExecute(result);
         }
+
 
         @Override
         protected void onPreExecute() {

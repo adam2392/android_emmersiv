@@ -15,21 +15,17 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:fillViewport="true">
-            <ListView
-                android:id="@android:id/list"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent" />
-            <!--<GridView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:id="@+id/gridview"-->
-                <!--android:columnWidth="90dp"-->
-                <!--android:numColumns="auto_fit"-->
-                <!--android:verticalSpacing="10dp"-->
-                <!--android:horizontalSpacing="10dp"-->
-                <!--android:stretchMode="columnWidth"-->
-                <!--android:gravity="center"-->
-                <!--/>-->
+            <GridView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/gridview"
+                android:columnWidth="90dp"
+                android:numColumns="auto_fit"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="10dp"
+                android:stretchMode="columnWidth"
+                android:gravity="center"
+                />
         </ScrollView>
     </RelativeLayout>
 
