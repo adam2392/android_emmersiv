@@ -46,56 +46,20 @@ public class ListApps extends Activity {
     private List<ApplicationInfo> appList = null;
     private ApplicationAdapter listadapter = null;
 
+    //the handlers to show a message before app closes
+    private final int interval = 5000; // 5 Second
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable(){
+        public void run() {
+            Toast.makeText(ListApps.this, "5 more seconds!", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_apps);    //set the content view to the xml file in "layout"
         gridView = (GridView) findViewById(R.id.gridview);  //initialize the gridview layout
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ApplicationInfo app = appList.get(position);
-                Timer timer = new Timer();                          // initialize a timer object
-
-                try {
-                    // get the package info for that app selected
-                    Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);         //exclude this from the recent history
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);                    //clear this from the top
-
-                    if(intent != null) {
-                        startActivity(intent);      // start the activity that was clicked
-//                        timer.schedule(             //start a schedule
-//                                new java.util.TimerTask() {
-//                                    @Override
-//                                    public void run() {
-//                                        Toast.makeText(getApplicationContext(), "5 seconds left!", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                },
-//                                (progress * 1000) - 5000            // the amount of time before execution
-//                        );
-
-                        timer.schedule(             //start a schedule
-                                new java.util.TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        Intent intent = packageManager.getLaunchIntentForPackage(PACKAGE_NAME);
-                                        startActivity(intent);
-
-                                        killApp();  // closes the app, and reopens the shell
-                                    }
-                                },
-                                progress * 1000            // the amount of time before execution
-                        );
-                    }
-                } catch (ActivityNotFoundException e) { // when no activity
-                    Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                } catch (Exception e) { //other exceptions
-                    Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        }); //end of grid click listener
 
         PACKAGE_NAME = getApplicationContext().getPackageName();    //store the local package name
 
@@ -122,6 +86,49 @@ public class ListApps extends Activity {
         //perform an async task to get list of app details... long process
         packageManager = getPackageManager();
         new LoadApplications().execute();
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ApplicationInfo app = appList.get(position);
+                Timer timer = new Timer();                          // initialize a timer object
+
+                try {
+                    // get the package info for that app selected
+                    Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);         //exclude this from the recent history
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);                    //clear this from the top
+
+                    if(intent != null) {
+                        startActivity(intent);      // start the activity that was clicked
+
+                        //handler's to show message 5 seconds before time is up
+                        if(progress > 5) {
+                            handler.postAtTime(runnable, System.currentTimeMillis() + progress * 1000 - interval);
+                            handler.postDelayed(runnable, interval);
+                        }
+
+                        timer.schedule(             //start a schedule to close the app and open shell
+                                new java.util.TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Intent intenthome = packageManager.getLaunchIntentForPackage(PACKAGE_NAME);
+                                        startActivity(intenthome);
+                                        finish();
+
+                                        killApp();  // closes the app, and reopens the shell
+                                    }
+                                },
+                                progress * 1000            // the amount of time before execution
+                        );
+                    }
+                } catch (ActivityNotFoundException e) { // when no activity
+                    Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                } catch (Exception e) { //other exceptions
+                    Toast.makeText(ListApps.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }); //end of grid click listener
     }   //end of "OnCreate"
 
     //private method to help us initialize variables in xml
