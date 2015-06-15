@@ -47,11 +47,12 @@ public class ListApps extends Activity {
     private ApplicationAdapter listadapter = null;
 
     //the handlers to show a message before app closes
-    private final int interval = 5000; // 5 Second
+    private static int timeLeft; //handles how much time is left
+    public final int interval = 5000;
     private Handler handler = new Handler();
     private Runnable runnable = new Runnable(){
         public void run() {
-            Toast.makeText(ListApps.this, "5 more seconds!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ListApps.this, timeLeft + " more seconds!", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -104,8 +105,21 @@ public class ListApps extends Activity {
 
                         //handler's to show message 5 seconds before time is up
                         if(progress > 5) {
+                            //show 5 seconds left message
                             handler.postAtTime(runnable, System.currentTimeMillis() + progress * 1000 - interval);
                             handler.postDelayed(runnable, interval);
+
+                            if(progress > 15) {
+                                //show 15 seconds left message
+                                handler.postAtTime(runnable, System.currentTimeMillis() + progress * 1000 - 15000);
+                                handler.postDelayed(runnable, 15000);
+                            }
+
+                            if(progress > 30) {
+                                //show 30 seconds left message
+                                handler.postAtTime(runnable, System.currentTimeMillis() + progress * 1000 - 30000);
+                                handler.postDelayed(runnable, 30000);
+                            }
                         }
 
                         timer.schedule(             //start a schedule to close the app and open shell
